@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block title %}Admin &middot; Reports{% endblock %}
+{% block content %}
+<h4>Attendance Reports</h4>
+<p class="text-muted">Export full attendance for a course as Excel for inclusion
+in academic records, board reports, or LMS upload.</p>
+
+<div class="card">
+  <table class="table mb-0">
+    <thead><tr><th>Code</th><th>Title</th><th>Lecturer</th><th>Sessions</th><th></th></tr></thead>
+    <tbody>
+      {% for c in courses %}
+      <tr>
+        <td>{{ c.code }}</td>
+        <td>{{ c.title }}</td>
+        <td>{{ (c.lecturer.title + ' ' + c.lecturer.full_name) if c.lecturer else '—' }}</td>
+        <td>{{ c.sessions|length }}</td>
+        <td>
+          <a href="{{ url_for('admin.export_course_report', course_id=c.id) }}"
+             class="btn btn-sm btn-outline-success">
+            <i class="bi bi-file-earmark-excel"></i> Export
+          </a>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

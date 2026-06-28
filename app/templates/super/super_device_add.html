@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% block title %}Register Terminal{% endblock %}
+{% block content %}
+<h4>Register Hikvision Terminal</h4>
+<form method="post" class="card p-4">
+  <div class="mb-3"><label>Name</label><input class="form-control" name="name" required placeholder="e.g. Main Lecture Hall"></div>
+  <div class="mb-3"><label>Model</label><input class="form-control" name="model" value="DS-K1T323MBFWX-E1"></div>
+  <div class="row">
+    <div class="col-md-8 mb-3"><label>IP Address</label><input class="form-control" name="ip_address" required placeholder="192.168.1.64"></div>
+    <div class="col-md-4 mb-3"><label>Port</label><input class="form-control" name="port" value="80"></div>
+  </div>
+  <div class="row">
+    <div class="col-md-4 mb-3">
+      <label>Connection</label>
+      <select class="form-select" name="connection_type">
+        <option value="wifi" selected>Wi-Fi</option>
+        <option value="ethernet">Ethernet</option>
+        <option value="poe">PoE</option>
+      </select>
+    </div>
+    <div class="col-md-8 mb-3"><label>Wi-Fi SSID (if applicable)</label>
+      <input class="form-control" name="wifi_ssid" placeholder="UPSA-Campus-WiFi"></div>
+  </div>
+  <div class="mb-3"><label>Username</label><input class="form-control" name="username" value="admin"></div>
+  <div class="mb-3"><label>Password</label><input type="password" class="form-control" name="password"></div>
+  <div>
+    <button class="btn btn-primary">Register</button>
+    <a class="btn btn-link" href="{{ url_for('superadmin.dashboard') }}">Cancel</a>
+  </div>
+</form>
+{% endblock %}

@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+{% block title %}Admin &middot; Dashboard{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h3>Administrator Dashboard</h3>
+  <div>
+    <a href="{{ url_for('admin.students_list') }}" class="btn btn-outline-primary btn-sm">Students</a>
+    <a href="{{ url_for('admin.courses_list') }}" class="btn btn-outline-primary btn-sm">Courses</a>
+    <a href="{{ url_for('admin.devices_list') }}" class="btn btn-outline-primary btn-sm">Devices</a>
+    <a href="{{ url_for('admin.reports') }}" class="btn btn-outline-primary btn-sm">Reports</a>
+  </div>
+</div>
+
+<div class="row g-3 mb-3">
+  <div class="col-md-3">
+    <div class="card kpi-card text-center"><div class="card-body">
+      <div class="text-muted small">Students</div>
+      <div class="display-6">{{ total_students }}</div>
+      <small>{{ enrolled_on_terminal }} enrolled on terminal</small>
+    </div></div>
+  </div>
+  <div class="col-md-3">
+    <div class="card kpi-card text-center"><div class="card-body">
+      <div class="text-muted small">Lecturers</div>
+      <div class="display-6">{{ total_lecturers }}</div>
+    </div></div>
+  </div>
+  <div class="col-md-3">
+    <div class="card kpi-card text-center"><div class="card-body">
+      <div class="text-muted small">Active Courses</div>
+      <div class="display-6">{{ total_courses }}</div>
+    </div></div>
+  </div>
+  <div class="col-md-3">
+    <div class="card kpi-card text-center"><div class="card-body">
+      <div class="text-muted small">Today</div>
+      <div class="display-6">{{ today_present }}</div>
+      <small>present &middot; {{ today_late }} late &middot; {{ today_sessions }} sessions</small>
+    </div></div>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-body">
+    <h5>Attendance Rate (last 7 days)</h5>
+    <canvas id="trendChart" height="80"></canvas>
+  </div>
+</div>
+{% endblock %}
+
+{% block body_extra %}
+<script>
+  const labels = {{ trend|map(attribute='date')|list|tojson }};
+  const data   = {{ trend|map(attribute='rate')|list|tojson }};
+  new Chart(document.getElementById('trendChart').getContext('2d'), {
+    type: 'line',
+    data: { labels: labels, datasets: [{ label: 'Attendance %', data: data, borderColor: '#003366',
+            backgroundColor: 'rgba(0,51,102,0.1)', fill: true, tension: 0.3 }] },
+    options: { scales: { y: { beginAtZero: true, max: 100 } } }
+  });
+</script>
+{% endblock %}

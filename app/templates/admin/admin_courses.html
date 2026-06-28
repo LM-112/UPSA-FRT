@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block title %}Admin &middot; Courses{% endblock %}
+{% block content %}
+<h4>Courses ({{ ACADEMIC_YEAR }})</h4>
+<div class="card mt-3">
+  <table class="table mb-0">
+    <thead><tr><th>Code</th><th>Title</th><th>Lecturer</th><th>Semester</th><th>Sessions</th></tr></thead>
+    <tbody>
+      {% for c in courses %}
+      <tr>
+        <td>{{ c.code }}</td>
+        <td>{{ c.title }}</td>
+        <td>{{ (c.lecturer.title + ' ' + c.lecturer.full_name) if c.lecturer else '—' }}</td>
+        <td>Sem {{ c.semester }}</td>
+        <td>{{ c.sessions|length }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

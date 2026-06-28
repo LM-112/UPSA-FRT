@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% block title %}Admin &middot; Devices{% endblock %}
+{% block content %}
+<h4>Hikvision Terminals</h4>
+<div class="card mt-3">
+  <table class="table mb-0">
+    <thead><tr><th>Name</th><th>Model</th><th>Network</th><th>IP</th><th>Status</th><th>Serial</th><th>Firmware</th></tr></thead>
+    <tbody>
+      {% for st in statuses %}
+      <tr>
+        <td>{{ st.device.name }}</td>
+        <td>{{ st.device.model }}</td>
+        <td>
+          {% if st.device.connection_type == 'wifi' %}
+            <i class="bi bi-wifi"></i> Wi-Fi
+            {% if st.device.wifi_ssid %}<small class="text-muted">({{ st.device.wifi_ssid }})</small>{% endif %}
+          {% else %}
+            <i class="bi bi-ethernet"></i> {{ st.device.connection_type|capitalize }}
+          {% endif %}
+        </td>
+        <td>{{ st.device.ip_address }}:{{ st.device.port }}</td>
+        <td>
+          {% if st.online %}
+            <span class="badge bg-success">Online</span>
+          {% else %}
+            <span class="badge bg-danger">Offline</span>
+          {% endif %}
+        </td>
+        <td>{{ st.info.serialNumber if st.info else st.device.serial_no or '—' }}</td>
+        <td>{{ st.info.firmwareVersion if st.info else '—' }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

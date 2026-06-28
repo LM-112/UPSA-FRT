@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+{% block title %}Student &middot; Dashboard{% endblock %}
+{% block content %}
+<h3>{{ me.full_name if me else current_user.full_name }}</h3>
+{% if me %}
+<div class="mb-3 text-muted small">
+  <span class="me-3"><strong>ID Number:</strong> {{ me.index_number }}</span>
+  <span class="me-3"><strong>Programme:</strong> {{ me.programme.name if me.programme else '—' }}</span>
+  <span class="me-3"><strong>Level:</strong> {{ me.level }}</span>
+  <span class="me-3"><strong>Hall:</strong> {{ me.hall or '—' }}</span>
+  <span><strong>Nationality:</strong> {{ me.nationality or '—' }}</span>
+</div>
+{% endif %}
+
+<div class="row g-3 mb-4">
+  <div class="col-md-3"><div class="card text-center"><div class="card-body">
+    <div class="text-muted small">Overall Attendance</div>
+    <div class="display-6" style="color:var(--upsa-primary);">{{ summary.rate or 0 }}%</div>
+  </div></div></div>
+  <div class="col-md-3"><div class="card text-center"><div class="card-body">
+    <div class="text-muted small">Present</div>
+    <div class="display-6 text-success">{{ summary.present or 0 }}</div>
+  </div></div></div>
+  <div class="col-md-3"><div class="card text-center"><div class="card-body">
+    <div class="text-muted small">Late</div>
+    <div class="display-6 text-warning">{{ summary.late or 0 }}</div>
+  </div></div></div>
+  <div class="col-md-3"><div class="card text-center"><div class="card-body">
+    <div class="text-muted small">Absent</div>
+    <div class="display-6 text-danger">{{ summary.absent or 0 }}</div>
+  </div></div></div>
+</div>
+
+<h5>My Courses</h5>
+<div class="card">
+  <table class="table table-hover mb-0">
+    <thead><tr><th>Code</th><th>Title</th><th>Sessions</th><th>Attendance %</th><th></th></tr></thead>
+    <tbody>
+      {% for c in courses %}
+      <tr>
+        <td>{{ c.course.code }}</td>
+        <td>{{ c.course.title }}</td>
+        <td>{{ c.total }}</td>
+        <td>
+          <div class="progress" style="height:20px;">
+            <div class="progress-bar
+                        {% if c.rate >= 75 %}bg-success
+                        {% elif c.rate >= 60 %}bg-warning
+                        {% else %}bg-danger{% endif %}"
+                 style="width: {{ c.rate }}%">{{ c.rate }}%</div>
+          </div>
+        </td>
+        <td>
+          <a class="btn btn-sm btn-outline-primary"
+             href="{{ url_for('student.course_detail', course_id=c.course.id) }}">
+            <i class="bi bi-list-ul"></i> Details
+          </a>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

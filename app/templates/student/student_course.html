@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block title %}{{ course.code }}{% endblock %}
+{% block content %}
+<h4>{{ course.code }} — {{ course.title }}</h4>
+<p class="text-muted">{{ course.lecturer.title }} {{ course.lecturer.full_name if course.lecturer else '' }}</p>
+<div class="card">
+  <table class="table mb-0">
+    <thead><tr><th>Date</th><th>Time</th><th>Venue</th><th>Status</th><th>Check-in</th></tr></thead>
+    <tbody>
+      {% for r in rows %}
+      <tr>
+        <td>{{ r.session.session_date }}</td>
+        <td>{{ r.session.start_time.strftime('%H:%M') }}</td>
+        <td>{{ r.session.venue or '—' }}</td>
+        <td>
+          {% set status = r.record.status if r.record else 'absent' %}
+          <span class="badge {{ 'badge-present' if status=='present' else 'badge-late' if status=='late' else 'badge-absent' }}">
+            {{ status }}
+          </span>
+        </td>
+        <td>{{ r.record.check_in_time.strftime('%H:%M:%S') if r.record and r.record.check_in_time else '—' }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+<a class="btn btn-link mt-3" href="{{ url_for('student.dashboard') }}">&laquo; Back</a>
+{% endblock %}

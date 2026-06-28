@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+{% block title %}Super Admin{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h3>Super Administrator</h3>
+  <a class="btn btn-sm btn-primary" href="{{ url_for('superadmin.device_add') }}">
+    <i class="bi bi-plus-circle"></i> Register Terminal
+  </a>
+</div>
+
+<h5>Registered Terminals</h5>
+<div class="card mb-4">
+  <table class="table mb-0">
+    <thead><tr><th>Name</th><th>Model</th><th>IP</th><th>Active</th><th>Actions</th></tr></thead>
+    <tbody>
+      {% for d in devices %}
+      <tr>
+        <td>{{ d.name }}</td>
+        <td>{{ d.model }}</td>
+        <td>{{ d.ip_address }}:{{ d.port }}</td>
+        <td>{% if d.is_active %}<span class="badge bg-success">Yes</span>{% else %}<span class="badge bg-secondary">No</span>{% endif %}</td>
+        <td>
+          <a class="btn btn-sm btn-outline-primary" href="{{ url_for('superadmin.device_probe', device_id=d.id) }}">Probe</a>
+          <form method="post" class="d-inline" action="{{ url_for('superadmin.device_register_listener', device_id=d.id) }}">
+            <button class="btn btn-sm btn-outline-success">Register Listener</button>
+          </form>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+<div class="row">
+  <div class="col-md-6">
+    <h6>Recent Enrolments</h6>
+    <div class="card">
+      <table class="table table-sm mb-0">
+        <thead><tr><th>Time</th><th>Action</th><th>Student</th><th>Result</th></tr></thead>
+        <tbody>
+          {% for e in enroll_recent %}
+          <tr>
+            <td>{{ e.created_at.strftime('%H:%M:%S') }}</td>
+            <td>{{ e.action }}</td>
+            <td>{{ e.student_id }}</td>
+            <td>{% if e.success %}<span class="badge bg-success">OK</span>{% else %}<span class="badge bg-danger">Fail</span>{% endif %}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+  <div class="col-md-6">
+    <h6>Recent Recognition Events</h6>
+    <div class="card">
+      <table class="table table-sm mb-0">
+        <thead><tr><th>Time</th><th>Employee</th><th>Sim.</th><th>Processed</th></tr></thead>
+        <tbody>
+          {% for ev in events_recent %}
+          <tr>
+            <td>{{ ev.occurred_at.strftime('%H:%M:%S') }}</td>
+            <td>{{ ev.employee_id_seen }}</td>
+            <td>{{ '%.2f' % ev.similarity if ev.similarity else '—' }}</td>
+            <td>{% if ev.processed %}<span class="badge bg-success">Yes</span>{% else %}<span class="badge bg-secondary">No</span>{% endif %}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}

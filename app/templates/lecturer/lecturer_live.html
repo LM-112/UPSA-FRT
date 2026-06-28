@@ -1,0 +1,93 @@
+{% extends "base.html" %}
+{% block title %}Live &middot; {{ session.course.code }}{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <div>
+    <h4>{{ session.course.code }} — {{ session.course.title }}</h4>
+    <div class="text-muted">
+      {{ session.session_date }} &middot; {{ session.start_time.strftime('%H:%M') }} – {{ session.end_time.strftime('%H:%M') }}
+      &middot; {{ session.venue or 'No venue' }}
+    </div>
+  </div>
+  <div>
+    <form method="post" action="{{ url_for('lecturer.toggle_session', session_id=session.id) }}" class="d-inline">
+      <button class="btn btn-sm {{ 'btn-warning' if session.is_open else 'btn-success' }}">
+        {{ 'Close session' if session.is_open else 'Open session' }}
+      </button>
+    </form>
+    <a class="btn btn-sm btn-outline-success"
+       href="{{ url_for('lecturer.export_session', session_id=session.id) }}">
+      <i class="bi bi-download"></i> Export Excel
+    </a>
+  </div>
+</div>
+
+<div class="row g-3 mb-3">
+  <div class="col-md-3"><div class="card text-center"><div class="card-body">
+    <div class="text-muted small">Present</div>
+    <div class="display-6 text-success" id="kpiPresent">0</div></div></div></div>
+  <div class="col-md-3"><div class="card text-center"><div class="card-body">
+    <div class="text-muted small">Late</div>
+    <div class="display-6 text-warning" id="kpiLate">0</div></div></div></div>
+  <div class="col-md-3"><div class="card text-center"><div class="card-body">
+    <div class="text-muted small">Absent</div>
+    <div class="display-6 text-danger" id="kpiAbsent">0</div></div></div></div>
+  <div class="col-md-3"><div class="card text-center"><div class="card-body">
+    <div class="text-muted small">Total</div>
+    <div class="display-6" id="kpiTotal">0</div></div></div></div>
+</div>
+
+<div class="card">
+  <div class="card-body">
+    <h6>Live Recognition Feed
+      <span class="badge bg-secondary ms-2" id="liveStatus">connecting…</span>
+    </h6>
+    <div class="table-responsive">
+      <table class="table table-sm table-striped" id="rosterTable">
+        <thead><tr>
+          <th>Index No.</th><th>Name</th><th>Status</th>
+          <th>Check-In</th><th>Score</th>
+        </tr></thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block body_extra %}
+<script>
+  const dataUrl = "{{ url_for('lecturer.live_attendance_data', session_id=session.id) }}";
+  function badge(status) {
+    return `<span class="badge ${status === 'present' ? 'badge-present'
+                                : status === 'late' ? 'badge-late'
+                                : 'badge-absent'}">${status}</span>`;
+  }
+  async function refresh() {
+    try {
+      const r = await fetch(dataUrl);
+      const data = await r.json();
+      document.getElementById('kpiPresent').textContent = data.summary.present;
+      document.getElementById('kpiLate').textContent = data.summary.late;
+      document.getElementById('kpiAbsent').textContent = data.summary.absent;
+      document.getElementById('kpiTotal').textContent = data.summary.total;
+      const tbody = document.querySelector('#rosterTable tbody');
+      tbody.innerHTML = data.rows.map(r => `<tr>
+        <td>${r.index_number}</td><td>${r.name}</td>
+        <td>${badge(r.status)}</td>
+        <td>${r.check_in || '—'}</td>
+        <td>${r.score || '—'}</td>
+      </tr>`).join('');
+      document.getElementById('liveStatus').className =
+        data.is_open ? 'badge bg-success ms-2' : 'badge bg-secondary ms-2';
+      document.getElementById('liveStatus').textContent =
+        data.is_open ? 'open · listening' : 'closed';
+    } catch (e) {
+      document.getElementById('liveStatus').textContent = 'error';
+      document.getElementById('liveStatus').className = 'badge bg-danger ms-2';
+    }
+  }
+  refresh();
+  setInterval(refresh, 3000);
+</script>
+{% endblock %}

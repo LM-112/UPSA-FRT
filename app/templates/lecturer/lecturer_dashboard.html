@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+{% block title %}Lecturer &middot; Dashboard{% endblock %}
+{% block content %}
+<h3>Welcome, {{ lec.title if lec else '' }} {{ current_user.full_name }}</h3>
+<p class="text-muted">Today's class sessions are listed below.</p>
+
+{% if today_sessions %}
+<div class="card">
+  <table class="table table-hover mb-0">
+    <thead><tr><th>Course</th><th>Time</th><th>Venue</th><th>Status</th><th></th></tr></thead>
+    <tbody>
+      {% for s in today_sessions %}
+      <tr>
+        <td><strong>{{ s.course.code }}</strong> &mdash; {{ s.course.title }}</td>
+        <td>{{ s.start_time.strftime('%H:%M') }} – {{ s.end_time.strftime('%H:%M') }}</td>
+        <td>{{ s.venue or '—' }}</td>
+        <td>
+          {% if s.is_open %}
+            <span class="badge bg-success">Open</span>
+          {% else %}
+            <span class="badge bg-secondary">Closed</span>
+          {% endif %}
+        </td>
+        <td>
+          <a href="{{ url_for('lecturer.live_attendance', session_id=s.id) }}"
+             class="btn btn-sm btn-primary">
+            <i class="bi bi-eye"></i> Live View
+          </a>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% else %}
+<div class="alert alert-info">No class sessions scheduled for today.</div>
+{% endif %}
+
+<h5 class="mt-4">My Courses</h5>
+<div class="row g-3">
+  {% for c in my_courses %}
+  <div class="col-md-4">
+    <div class="card"><div class="card-body">
+      <h6>{{ c.code }}</h6>
+      <div class="text-muted small">{{ c.title }}</div>
+      <div class="mt-2"><span class="badge bg-light text-dark">{{ c.sessions|length }} sessions</span></div>
+    </div></div>
+  </div>
+  {% endfor %}
+</div>
+{% endblock %}
